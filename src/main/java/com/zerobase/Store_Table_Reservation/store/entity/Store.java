@@ -13,8 +13,10 @@ public class Store {
 
     private String name;
 
+    // 가게 위도
     private double latitude;
 
+    // 가게 경도
     private double longitude;
 
     private String description;
