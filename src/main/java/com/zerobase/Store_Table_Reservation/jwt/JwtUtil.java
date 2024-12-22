@@ -39,9 +39,8 @@ public class JwtUtil {
     private String createToken(MemberDto memberDto, long accessTokenExpTime) {
         Claims claims = Jwts.claims();
 
-        // ID 와 멤버 권한을 JWT Claim 에 넣는다.
+        // ID 를 JWT 의 Claim 에 넣는다.
         claims.put("memberId", memberDto.getMemberId());
-        claims.put("role", memberDto.getRole());
 
         // 현재 시간과 만료 시간을 설정
         ZonedDateTime now = ZonedDateTime.now();

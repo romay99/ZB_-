@@ -2,6 +2,11 @@ package com.zerobase.Store_Table_Reservation.member.service;
 
 import com.zerobase.Store_Table_Reservation.exception.customException.IdAlreadyUsedException;
 import com.zerobase.Store_Table_Reservation.exception.customException.IdNotNullException;
+import com.zerobase.Store_Table_Reservation.exception.customException.MemberNotFoundException;
+import com.zerobase.Store_Table_Reservation.exception.customException.MemberPasswordNotMatchException;
+import com.zerobase.Store_Table_Reservation.jwt.JwtUtil;
+import com.zerobase.Store_Table_Reservation.member.dto.request.MemberDto;
+import com.zerobase.Store_Table_Reservation.member.dto.request.MemberLoginDto;
 import com.zerobase.Store_Table_Reservation.member.dto.request.MemberSignUpDto;
 import com.zerobase.Store_Table_Reservation.member.entity.Member;
 import com.zerobase.Store_Table_Reservation.member.repository.MemberRepository;
@@ -12,12 +17,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+
 @Service
 @RequiredArgsConstructor
 public class MemberService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -44,6 +51,34 @@ public class MemberService implements UserDetailsService {
 
         // 저장된 MemberEntity 를 return
         return memberRepository.save(MemberSignUpDto.toEntity(dto));
+    }
+
+
+    /**
+     * 로그인 하는 메서드
+     * @param dto 회원의 ID 와 비밀번호를 담은 DTO
+     * @return 정상적으로 로그인 성공시 JWT 응답
+     */
+    public String longinMember(MemberLoginDto dto) {
+        // ID 값으로 멤버를 찾는다. 존재하지 않는다면 예외 발생
+        Member member = memberRepository.findByMemberId(dto.getUsername()).orElseThrow(
+                () -> new MemberNotFoundException("존재하지 않는 회원정보 입니다.")
+        );
+
+        // 비밀번호가 일치하지 않으면 예외 발생
+        if (!passwordEncoder.matches(dto.getPassword(),member.getPassword())) {
+            throw new MemberPasswordNotMatchException("유효하지 않은 비밀번호 입니다.");
+        }
+
+        // 토큰 생성
+        String accessToken = jwtUtil.createAccessToken(
+                MemberDto.builder()
+                        .memberId(member.getMemberId())
+                        .role(member.getRole())
+                        .build()
+        );
+
+        return accessToken;
     }
 
 

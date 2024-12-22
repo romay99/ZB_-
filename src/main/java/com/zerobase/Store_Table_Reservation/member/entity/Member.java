@@ -20,7 +20,8 @@ public class Member implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long code;
 
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private MemberRole role;
 
     private String memberId;
 
@@ -33,10 +34,7 @@ public class Member implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
-
-        for(String role : role.split(",")){
-            authorities.add(new SimpleGrantedAuthority(role));
-        }
+        authorities.add(new SimpleGrantedAuthority(role.name()));
         return authorities;
     }
 

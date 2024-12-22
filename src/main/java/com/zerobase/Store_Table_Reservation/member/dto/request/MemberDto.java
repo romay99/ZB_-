@@ -1,14 +1,14 @@
 package com.zerobase.Store_Table_Reservation.member.dto.request;
 
 import com.zerobase.Store_Table_Reservation.member.entity.MemberRole;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.util.List;
+import lombok.*;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class MemberDto {
     private String memberId;
-    private List<MemberRole> role;
+    private MemberRole role;
 }

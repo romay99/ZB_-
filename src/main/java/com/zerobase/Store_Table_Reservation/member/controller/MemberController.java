@@ -1,5 +1,6 @@
 package com.zerobase.Store_Table_Reservation.member.controller;
 
+import com.zerobase.Store_Table_Reservation.member.dto.request.MemberLoginDto;
 import com.zerobase.Store_Table_Reservation.member.dto.request.MemberSignUpDto;
 import com.zerobase.Store_Table_Reservation.member.entity.Member;
 import com.zerobase.Store_Table_Reservation.member.service.MemberService;
@@ -21,9 +22,17 @@ public class MemberController {
      */
     @PostMapping("/signup")
     public ResponseEntity<Member> memberSignup(@RequestBody MemberSignUpDto dto) {
-        System.out.println(dto);
         // memberService 에서 저장된 member를 return
         Member member = memberService.signUpMember(dto);
         return ResponseEntity.ok().body(member);
+    }
+
+    /**
+     * 로그인 하는 메서드
+     */
+    @PostMapping("/login")
+    public ResponseEntity<String> memberLogin(@RequestBody MemberLoginDto dto) {
+        String token = memberService.longinMember(dto);
+        return ResponseEntity.ok().body(token);
     }
 }

@@ -23,9 +23,9 @@ public class MemberSignUpDto {
      * DTO --> Entity 변환 메서드
      */
     public static Member toEntity(MemberSignUpDto dto) {
-        MemberRole partner = MemberRole.MEMBER;
+        MemberRole partner = MemberRole.ROLE_USER;
         if (dto.partner) { // 파트너 가입인 경우에만 파트너 권한 추가
-            partner = MemberRole.PARTNER;
+            partner = MemberRole.ROLE_PARTNER;
         }
 
         return Member.builder()
@@ -33,7 +33,7 @@ public class MemberSignUpDto {
                 .password(dto.getMemberPassword())
                 .name(dto.getMemberName())
                 .tel(dto.getMemberTel())
-                .role(partner.getValue())
+                .role(partner)
                 .build();
     }
 }
