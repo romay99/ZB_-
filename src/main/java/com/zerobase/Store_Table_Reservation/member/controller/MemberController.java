@@ -19,10 +19,10 @@ public class MemberController {
      * 회원가입 하는 메서드
      */
     @PostMapping("/signup")
-    public ResponseEntity<Member> memberSignup(@RequestBody MemberSignUpDto dto) {
+    public ResponseEntity<String> memberSignup(@RequestBody MemberSignUpDto dto) {
         // memberService 에서 저장된 member를 return
         Member member = memberService.signUpMember(dto);
-        return ResponseEntity.ok().body(member);
+        return ResponseEntity.ok().body("환영합니다, "+ member.getMemberId() + " 님");
     }
 
     /**
@@ -34,9 +34,4 @@ public class MemberController {
         return ResponseEntity.ok().body(token);
     }
 
-    @GetMapping("/test")
-    @PreAuthorize("hasRole('ROLE_PARTNER')")
-    public ResponseEntity<String> test() {
-        return ResponseEntity.ok().build();
-    }
 }

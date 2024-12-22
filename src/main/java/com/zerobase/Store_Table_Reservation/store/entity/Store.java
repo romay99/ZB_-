@@ -1,11 +1,15 @@
 package com.zerobase.Store_Table_Reservation.store.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.zerobase.Store_Table_Reservation.member.entity.Member;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Store {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,4 +24,7 @@ public class Store {
     private double longitude;
 
     private String description;
+
+    @ManyToOne
+    private Member member;
 }

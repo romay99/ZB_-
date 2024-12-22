@@ -47,6 +47,7 @@ public class SecurityConfig {
                         request.requestMatchers("/member/login", "/member/signup").permitAll()
                                 .anyRequest().authenticated());
 
+        // JWT 필터 추가
         http
                 .addFilterBefore(new JwtAuthFilter(customUserDetailsService, jwtUtil), UsernamePasswordAuthenticationFilter.class);
 

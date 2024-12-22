@@ -71,16 +71,12 @@ public class MemberService implements UserDetailsService {
         }
 
         // 토큰 생성
-        String accessToken = jwtUtil.createAccessToken(
+        return jwtUtil.createAccessToken(
                 MemberDto.builder()
                         .memberId(member.getMemberId())
                         .role(member.getRole())
                         .build()
         );
-
-        return accessToken;
     }
-
-
 
 }
