@@ -1,5 +1,6 @@
 package com.zerobase.Store_Table_Reservation.jwt;
 
+import com.zerobase.Store_Table_Reservation.member.service.CustomUserDetailsService;
 import com.zerobase.Store_Table_Reservation.member.service.MemberService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -16,7 +17,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final MemberService memberService;
+    private final CustomUserDetailsService customUserDetailsService;
     private final JwtUtil jwtUtil;
 
     @Override
@@ -32,7 +33,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 String userId = jwtUtil.getUserId(token);
 
                 //유저와 토큰 일치 시 userDetails 생성
-                UserDetails userDetails = memberService.loadUserByUsername(userId.toString());
+                UserDetails userDetails = customUserDetailsService.loadUserByUsername(userId.toString());
 
                 if (userDetails != null) {
                     //UserDetsils, Password, Role -> 접근권한 인증 Token 생성

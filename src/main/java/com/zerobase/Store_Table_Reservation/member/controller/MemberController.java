@@ -6,10 +6,8 @@ import com.zerobase.Store_Table_Reservation.member.entity.Member;
 import com.zerobase.Store_Table_Reservation.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,5 +32,11 @@ public class MemberController {
     public ResponseEntity<String> memberLogin(@RequestBody MemberLoginDto dto) {
         String token = memberService.longinMember(dto);
         return ResponseEntity.ok().body(token);
+    }
+
+    @GetMapping("/test")
+    @PreAuthorize("hasRole('ROLE_PARTNER')")
+    public ResponseEntity<String> test() {
+        return ResponseEntity.ok().build();
     }
 }

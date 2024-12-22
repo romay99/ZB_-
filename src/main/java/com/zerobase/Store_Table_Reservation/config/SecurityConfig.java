@@ -2,10 +2,11 @@ package com.zerobase.Store_Table_Reservation.config;
 
 import com.zerobase.Store_Table_Reservation.jwt.JwtAuthFilter;
 import com.zerobase.Store_Table_Reservation.jwt.JwtUtil;
-import com.zerobase.Store_Table_Reservation.member.service.MemberService;
+import com.zerobase.Store_Table_Reservation.member.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -17,10 +18,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
-    private final MemberService memberService;
+    private final CustomUserDetailsService customUserDetailsService;
 
     /**
      * 패스워드 인코더 빈 등록
@@ -42,10 +44,11 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests((request) ->
-                        request.requestMatchers("/**").permitAll());
+                        request.requestMatchers("/member/login", "/member/signup").permitAll()
+                                .anyRequest().authenticated());
 
         http
-                .addFilterBefore(new JwtAuthFilter(memberService,jwtUtil), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtAuthFilter(customUserDetailsService, jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
 
         return http.build();
