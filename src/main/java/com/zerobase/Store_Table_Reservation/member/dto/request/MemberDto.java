@@ -1,4 +1,4 @@
-package com.zerobase.Store_Table_Reservation.member.dto;
+package com.zerobase.Store_Table_Reservation.member.dto.request;
 
 import com.zerobase.Store_Table_Reservation.member.entity.MemberRole;
 import lombok.Getter;

@@ -1,6 +1,6 @@
 package com.zerobase.Store_Table_Reservation.jwt;
 
-import com.zerobase.Store_Table_Reservation.member.dto.MemberDto;
+import com.zerobase.Store_Table_Reservation.member.dto.request.MemberDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.sql.Date;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 @Component
