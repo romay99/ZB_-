@@ -5,8 +5,11 @@ import com.zerobase.Store_Table_Reservation.exception.customException.StoreMembe
 import com.zerobase.Store_Table_Reservation.exception.customException.StoreNotFoundException;
 import com.zerobase.Store_Table_Reservation.member.entity.Member;
 import com.zerobase.Store_Table_Reservation.member.repository.MemberRepository;
+import com.zerobase.Store_Table_Reservation.store.dto.request.StoreDetailReqeustDto;
 import com.zerobase.Store_Table_Reservation.store.dto.request.StoreModifyDto;
+import com.zerobase.Store_Table_Reservation.store.dto.request.StoreReserveDto;
 import com.zerobase.Store_Table_Reservation.store.dto.request.StoreUploadDto;
+import com.zerobase.Store_Table_Reservation.store.dto.response.StoreDetailDto;
 import com.zerobase.Store_Table_Reservation.store.entity.Store;
 import com.zerobase.Store_Table_Reservation.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,23 @@ import java.util.Optional;
 public class StoreService {
     private final StoreRepository storeRepository;
     private final MemberRepository memberRepository;
+
+    /**
+     * 두 지점의 거리를 구하는 Haversine 공식
+     */
+    public double getDistanceFromUser(double lat1, double lat2, double long1, double long2) {
+        final int R = 6371; // 지구 반지름 (Km)
+
+        // 위도와 경도를 라디안으로 변환
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(long2 - long1);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return R * c; // 거리 계산 (Km 단위)
+    }
 
     /**
      * 가게 업로드 하는 메서드
@@ -80,5 +100,36 @@ public class StoreService {
         }
         // 파라미터로 받은 PK 값으로 삭제
         storeRepository.deleteById(storeCode);
+    }
+
+    /**
+     * 가게 상세정보 조회하는 메서드
+     */
+    public StoreDetailDto getStoreDetail(StoreDetailReqeustDto dto) {
+        // 가게 정보가 존재하지 않으면 예외 발생
+        Store store = storeRepository.findById(dto.getStoreCode()).orElseThrow(
+                () -> new StoreNotFoundException("존재하지 않는 가게 정보입니다."));
+
+        double lat1 = dto.getLatitude();
+        double long1 = dto.getLongitude();
+        double lat2 = store.getLatitude();
+        double long2 = store.getLongitude();
+
+        // 응답을 위한 StoreDetailDto 생성 및 초기화
+        return StoreDetailDto.builder()
+                .storeCode(store.getCode())
+                .storeName(store.getName())
+                .storeDescription(store.getDescription())
+                .storeRating(store.getRating())
+                // Haversine 공식을 이용해 거리(km단위) 구하기
+                .storeDistance(getDistanceFromUser(lat1, lat2, long1, long2))
+                .build();
+    }
+
+    /**
+     * 가게 예약하는 메서드
+     */
+    public void reserveStore(StoreReserveDto dto,String memberId) {
+
     }
 }

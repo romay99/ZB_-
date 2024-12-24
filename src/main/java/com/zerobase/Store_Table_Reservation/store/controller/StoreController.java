@@ -1,7 +1,10 @@
 package com.zerobase.Store_Table_Reservation.store.controller;
 
+import com.zerobase.Store_Table_Reservation.store.dto.request.StoreDetailReqeustDto;
 import com.zerobase.Store_Table_Reservation.store.dto.request.StoreModifyDto;
+import com.zerobase.Store_Table_Reservation.store.dto.request.StoreReserveDto;
 import com.zerobase.Store_Table_Reservation.store.dto.request.StoreUploadDto;
+import com.zerobase.Store_Table_Reservation.store.dto.response.StoreDetailDto;
 import com.zerobase.Store_Table_Reservation.store.entity.Store;
 import com.zerobase.Store_Table_Reservation.store.service.StoreService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +28,7 @@ public class StoreController {
         // SecurityContextHolder 에서 인증된 사용자의 ID 를 가져온다.
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Store store = storeService.uploadStore(dto, username);
-        return ResponseEntity.ok().body(store.getName()+"가 정상적으로 등록되었습니다.");
+        return ResponseEntity.ok().body(store.getName() + "가 정상적으로 등록되었습니다.");
     }
 
     /**
@@ -50,5 +53,27 @@ public class StoreController {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         storeService.deleteStore(storeCode, username);
         return ResponseEntity.ok().body("가게 정보가 정상적으로 삭제되었습니다.");
+    }
+
+    /**
+     * 가게의 상세정보를 조회하는 메서드
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<StoreDetailDto> getStoreDetail(@RequestBody StoreDetailReqeustDto dto) {
+        StoreDetailDto storeDetail = storeService.getStoreDetail(dto);
+        return ResponseEntity.ok().body(storeDetail);
+    }
+
+    /**
+     * 가게 예약하는 메서드. 로그인 필수
+     */
+    @PostMapping("/reservation/{id}")
+    // 로그인 필수
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_PARTNER')")
+    public ResponseEntity<?> reserveStore(@RequestBody StoreReserveDto dto) {
+        // SecurityContextHolder 에서 인증된 사용자의 ID 를 가져온다.
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        storeService.reserveStore(dto,username);
+        return ResponseEntity.ok().body("구현중");
     }
 }

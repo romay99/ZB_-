@@ -25,6 +25,8 @@ public class Store {
 
     private String description;
 
+    private double rating;
+
     @ManyToOne
     private Member member;
 }
