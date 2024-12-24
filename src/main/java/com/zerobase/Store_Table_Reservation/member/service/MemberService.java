@@ -50,6 +50,7 @@ public class MemberService implements UserDetailsService {
         dto.setMemberPassword(passwordEncoder.encode(dto.getMemberPassword()));
 
         // 저장된 MemberEntity 를 return
+        // MemberSignUpDto 의 partner 변수로 점장 이용자인지 일반 이용자인지 구분한다.
         return memberRepository.save(MemberSignUpDto.toEntity(dto));
     }
 

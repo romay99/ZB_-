@@ -1,9 +1,6 @@
 package com.zerobase.Store_Table_Reservation.exception;
 
-import com.zerobase.Store_Table_Reservation.exception.customException.IdAlreadyUsedException;
-import com.zerobase.Store_Table_Reservation.exception.customException.IdNotNullException;
-import com.zerobase.Store_Table_Reservation.exception.customException.MemberNotFoundException;
-import com.zerobase.Store_Table_Reservation.exception.customException.MemberPasswordNotMatchException;
+import com.zerobase.Store_Table_Reservation.exception.customException.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -44,6 +41,22 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MemberPasswordNotMatchException.class)
     public ResponseEntity<ErrorResponse> handleMemberPasswordNotMatchException(MemberPasswordNotMatchException e) {
+        ErrorResponse response = new ErrorResponse(e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * ID 값으로 조회한 가게 정보가 존재하지 않을때 예외 처리
+     */
+    public ResponseEntity<ErrorResponse> handleStoreNotFoundException(StoreNotFoundException e) {
+        ErrorResponse response = new ErrorResponse(e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * 등록된 가게의 점장과 요청한 사용자가 다를경우 예외 처리
+     */
+    public ResponseEntity<ErrorResponse> handleStoreMemberNotMatchException(StoreMemberNotMatchException e) {
         ErrorResponse response = new ErrorResponse(e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
