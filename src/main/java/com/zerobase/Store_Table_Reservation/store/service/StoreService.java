@@ -132,4 +132,11 @@ public class StoreService {
     public void reserveStore(StoreReserveDto dto,String memberId) {
 
     }
+
+    /**
+     * 가게 정보들 받아오는 메서드
+     */
+    public void getStoreList() {
+
+    }
 }

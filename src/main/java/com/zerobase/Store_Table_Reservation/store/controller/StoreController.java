@@ -76,4 +76,10 @@ public class StoreController {
         storeService.reserveStore(dto,username);
         return ResponseEntity.ok().body("구현중");
     }
+
+    @GetMapping
+    public ResponseEntity<String> getStoreList() {
+        storeService.getStoreList();
+        return ResponseEntity.ok().body("구현중");
+    }
 }
