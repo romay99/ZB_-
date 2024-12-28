@@ -1,5 +1,6 @@
 package com.zerobase.Store_Table_Reservation.store.controller;
 
+import com.zerobase.Store_Table_Reservation.reservation.dto.response.ReservationSuccessResponse;
 import com.zerobase.Store_Table_Reservation.store.dto.request.StoreDetailReqeustDto;
 import com.zerobase.Store_Table_Reservation.store.dto.request.StoreModifyDto;
 import com.zerobase.Store_Table_Reservation.store.dto.request.StoreReserveDto;
@@ -58,7 +59,7 @@ public class StoreController {
     /**
      * 가게의 상세정보를 조회하는 메서드
      */
-    @GetMapping("/{id}")
+    @GetMapping("/detail")
     public ResponseEntity<StoreDetailDto> getStoreDetail(@RequestBody StoreDetailReqeustDto dto) {
         StoreDetailDto storeDetail = storeService.getStoreDetail(dto);
         return ResponseEntity.ok().body(storeDetail);
@@ -67,14 +68,14 @@ public class StoreController {
     /**
      * 가게 예약하는 메서드. 로그인 필수
      */
-    @PostMapping("/reservation/{id}")
+    @PostMapping("/reservation")
     // 로그인 필수
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_PARTNER')")
-    public ResponseEntity<?> reserveStore(@RequestBody StoreReserveDto dto) {
+    public ResponseEntity<ReservationSuccessResponse> reserveStore(@RequestBody StoreReserveDto dto) {
         // SecurityContextHolder 에서 인증된 사용자의 ID 를 가져온다.
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        storeService.reserveStore(dto,username);
-        return ResponseEntity.ok().body("구현중");
+        ReservationSuccessResponse reservationSuccessResponse = storeService.reserveStore(dto,username);
+        return ResponseEntity.ok().body(reservationSuccessResponse);
     }
 
     @GetMapping

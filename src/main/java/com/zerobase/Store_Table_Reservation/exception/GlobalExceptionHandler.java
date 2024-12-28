@@ -48,6 +48,7 @@ public class GlobalExceptionHandler {
     /**
      * ID 값으로 조회한 가게 정보가 존재하지 않을때 예외 처리
      */
+    @ExceptionHandler(StoreNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleStoreNotFoundException(StoreNotFoundException e) {
         ErrorResponse response = new ErrorResponse(e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -56,7 +57,17 @@ public class GlobalExceptionHandler {
     /**
      * 등록된 가게의 점장과 요청한 사용자가 다를경우 예외 처리
      */
+    @ExceptionHandler(StoreMemberNotMatchException.class)
     public ResponseEntity<ErrorResponse> handleStoreMemberNotMatchException(StoreMemberNotMatchException e) {
+        ErrorResponse response = new ErrorResponse(e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * 사용자가 선택한 시간에 이미 예약이 차있을경우 예외처리
+     */
+    @ExceptionHandler(AlreadyReservedException.class)
+    public ResponseEntity<ErrorResponse> handleAlreadyReservedException(AlreadyReservedException e) {
         ErrorResponse response = new ErrorResponse(e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }

@@ -44,7 +44,7 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests((request) ->
-                        request.requestMatchers("/member/login", "/member/signup").permitAll()
+                        request.requestMatchers("/member/login", "/member/signup","/store/detail").permitAll()
                                 .anyRequest().authenticated());
 
         // JWT 필터 추가

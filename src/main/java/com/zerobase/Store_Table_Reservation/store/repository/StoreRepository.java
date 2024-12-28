@@ -10,9 +10,7 @@ import java.util.List;
 @Repository
 public interface StoreRepository extends JpaRepository<Store,Long> {
 
-    List<Store> findAllByMemberMemberId(String memberId);
-
-    // 가게 순으로 가게 데이터 받아오기
+    // 가게 이름 순으로 가게 데이터 받아오기
     @Query("select s from Store s order by s.name ASC")
     List<Store> findAllOrderByStoreName();
 }

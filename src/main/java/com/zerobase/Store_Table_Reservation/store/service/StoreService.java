@@ -1,10 +1,14 @@
 package com.zerobase.Store_Table_Reservation.store.service;
 
+import com.zerobase.Store_Table_Reservation.exception.customException.AlreadyReservedException;
 import com.zerobase.Store_Table_Reservation.exception.customException.MemberNotFoundException;
 import com.zerobase.Store_Table_Reservation.exception.customException.StoreMemberNotMatchException;
 import com.zerobase.Store_Table_Reservation.exception.customException.StoreNotFoundException;
 import com.zerobase.Store_Table_Reservation.member.entity.Member;
 import com.zerobase.Store_Table_Reservation.member.repository.MemberRepository;
+import com.zerobase.Store_Table_Reservation.reservation.dto.response.ReservationSuccessResponse;
+import com.zerobase.Store_Table_Reservation.reservation.entity.Reservation;
+import com.zerobase.Store_Table_Reservation.reservation.repository.ReservationRepository;
 import com.zerobase.Store_Table_Reservation.store.dto.request.StoreDetailReqeustDto;
 import com.zerobase.Store_Table_Reservation.store.dto.request.StoreModifyDto;
 import com.zerobase.Store_Table_Reservation.store.dto.request.StoreReserveDto;
@@ -15,13 +19,14 @@ import com.zerobase.Store_Table_Reservation.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class StoreService {
     private final StoreRepository storeRepository;
     private final MemberRepository memberRepository;
+    private final ReservationRepository reservationRepository;
 
     /**
      * 두 지점의 거리를 구하는 Haversine 공식
@@ -129,8 +134,45 @@ public class StoreService {
     /**
      * 가게 예약하는 메서드
      */
-    public void reserveStore(StoreReserveDto dto,String memberId) {
+    public ReservationSuccessResponse reserveStore(StoreReserveDto dto,String memberId) {
+        // 선택한 가게의 당일 예약 데이터들 가져오기
+        List<Reservation> todayReservationList = reservationRepository.findAllReservationByStoreAndToday(dto.getStoreCode(),dto.getDate());
 
+        System.out.println("todayReservationList = " + todayReservationList.size());
+        for (Reservation r : todayReservationList) {
+//          당일 예약중 겹치는 시간이 있다면 예외 발생
+            if (r.getReservationTime().getHour() == dto.getTime().getHour()) {
+                throw new AlreadyReservedException("선택한 시간은 예약이 불가능합니다.");
+            }
+        }
+
+        // Token 에서 추출한 Member 의 ID 로 Member Entity 가져오기
+        Member member = memberRepository.findByMemberId(memberId).orElseThrow(
+                () -> new MemberNotFoundException("존재하지 않는 사용자입니다.")
+        );
+
+        // Store Entity 가져오기
+        Store store = storeRepository.findById(dto.getStoreCode()).orElseThrow(
+                () -> new StoreNotFoundException("존재하지 않는 가게입니다.")
+        );
+
+        // 예약 정보 저장
+        reservationRepository.save(
+                Reservation.builder()
+                        .reservationDate(dto.getDate())
+                        .reservationTime(dto.getTime())
+                        .visited(false)
+                        .store(store)
+                        .member(member)
+                        .build()
+        );
+
+        // DTO 객체로 return
+        return ReservationSuccessResponse.builder()
+                .storeName(store.getName())
+                .date(dto.getDate())
+                .time(dto.getTime())
+                .build();
     }
 
     /**
