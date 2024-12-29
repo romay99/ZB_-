@@ -11,6 +11,6 @@ import java.util.List;
 public interface StoreRepository extends JpaRepository<Store,Long> {
 
     // 가게 이름 순으로 가게 데이터 받아오기
-    @Query("select s from Store s order by s.name ASC")
+    @Query("SELECT s FROM Store s ORDER BY s.name ASC")
     List<Store> findAllOrderByStoreName();
 }

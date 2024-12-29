@@ -1,10 +1,7 @@
 package com.zerobase.Store_Table_Reservation.store.controller;
 
 import com.zerobase.Store_Table_Reservation.reservation.dto.response.ReservationSuccessResponse;
-import com.zerobase.Store_Table_Reservation.store.dto.request.StoreDetailReqeustDto;
-import com.zerobase.Store_Table_Reservation.store.dto.request.StoreModifyDto;
-import com.zerobase.Store_Table_Reservation.store.dto.request.StoreReserveDto;
-import com.zerobase.Store_Table_Reservation.store.dto.request.StoreUploadDto;
+import com.zerobase.Store_Table_Reservation.store.dto.request.*;
 import com.zerobase.Store_Table_Reservation.store.dto.response.StoreDetailDto;
 import com.zerobase.Store_Table_Reservation.store.entity.Store;
 import com.zerobase.Store_Table_Reservation.store.service.StoreService;
@@ -78,7 +75,17 @@ public class StoreController {
         return ResponseEntity.ok().body(reservationSuccessResponse);
     }
 
-    @GetMapping
+    /**
+     * 도착확인 하는 메서드. 고객은 현장에 와서 키오스크로 확인하기 때문에 JWT 사용 불가
+     * 현장에서 입력한 memberID 와 전화번호로 유효성 검사를 진행한다.
+     */
+    @PostMapping("/visit")
+    public ResponseEntity<?> arrivalConfirmation(@RequestBody ArrivalConfirmationDto dto) {
+        storeService.arrivalConfirmation(dto);
+        return ResponseEntity.ok().body("예약 방문이 확인되었습니다.");
+
+    }
+
     public ResponseEntity<String> getStoreList() {
         storeService.getStoreList();
         return ResponseEntity.ok().body("구현중");

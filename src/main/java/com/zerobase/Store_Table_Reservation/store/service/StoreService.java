@@ -1,18 +1,12 @@
 package com.zerobase.Store_Table_Reservation.store.service;
 
-import com.zerobase.Store_Table_Reservation.exception.customException.AlreadyReservedException;
-import com.zerobase.Store_Table_Reservation.exception.customException.MemberNotFoundException;
-import com.zerobase.Store_Table_Reservation.exception.customException.StoreMemberNotMatchException;
-import com.zerobase.Store_Table_Reservation.exception.customException.StoreNotFoundException;
+import com.zerobase.Store_Table_Reservation.exception.customException.*;
 import com.zerobase.Store_Table_Reservation.member.entity.Member;
 import com.zerobase.Store_Table_Reservation.member.repository.MemberRepository;
 import com.zerobase.Store_Table_Reservation.reservation.dto.response.ReservationSuccessResponse;
 import com.zerobase.Store_Table_Reservation.reservation.entity.Reservation;
 import com.zerobase.Store_Table_Reservation.reservation.repository.ReservationRepository;
-import com.zerobase.Store_Table_Reservation.store.dto.request.StoreDetailReqeustDto;
-import com.zerobase.Store_Table_Reservation.store.dto.request.StoreModifyDto;
-import com.zerobase.Store_Table_Reservation.store.dto.request.StoreReserveDto;
-import com.zerobase.Store_Table_Reservation.store.dto.request.StoreUploadDto;
+import com.zerobase.Store_Table_Reservation.store.dto.request.*;
 import com.zerobase.Store_Table_Reservation.store.dto.response.StoreDetailDto;
 import com.zerobase.Store_Table_Reservation.store.entity.Store;
 import com.zerobase.Store_Table_Reservation.store.repository.StoreRepository;
@@ -173,6 +167,29 @@ public class StoreService {
                 .date(dto.getDate())
                 .time(dto.getTime())
                 .build();
+    }
+
+    /**
+     * 예약확인하는 메서드. 유효성검사 진행
+     */
+    public void arrivalConfirmation(ArrivalConfirmationDto dto) {
+        // 가게 PK 값과 유저의 ID 로 예약내역 불러오기
+        // 예약 내역이 존재하지 않는다면 예외 발생
+        Reservation reservation = reservationRepository.findByStoreCodeAndMemberId(dto.getStoreCode(), dto.getMemberId())
+                .orElseThrow(() -> new ReservationNotFoundException("예약내역이 존재하지 않습니다."));
+
+        // 고객의 도착시간이 예약시간보다 10분 전이어야한다.
+        if (reservation.getReservationTime().isAfter(dto.getArrivalTime().plusMinutes(10))) {
+            System.out.println("reservation = " + reservation.getReservationTime());
+            System.out.println("dto.getArrivalTime().plusMinutes(10) = " + dto.getArrivalTime().plusMinutes(10));
+
+            // 체크필요
+            throw new ReservationTimeInvalidException("예약시간이 만료되었습니다.");
+        }
+
+        // 방문처리 해주고 다시 DB에 저장
+        reservation.setVisited(true);
+        reservationRepository.save(reservation);
     }
 
     /**

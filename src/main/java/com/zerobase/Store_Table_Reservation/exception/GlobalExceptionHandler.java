@@ -72,5 +72,23 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * 예약 내역이 존재하지 않을 경우 예외처리
+     */
+    @ExceptionHandler(ReservationNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleReservationNotFoundException(ReservationNotFoundException e) {
+        ErrorResponse response = new ErrorResponse(e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * 예약 시간과 사용자 도착시간이 유효하지않을때 (도착시간이 늦었을때) 예외처리
+     */
+    @ExceptionHandler(ReservationTimeInvalidException.class)
+    public ResponseEntity<ErrorResponse> handleReservationTimeInvalidException(ReservationTimeInvalidException e) {
+        ErrorResponse response = new ErrorResponse(e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
 
 }
