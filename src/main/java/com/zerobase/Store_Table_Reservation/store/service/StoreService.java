@@ -4,6 +4,7 @@ import com.zerobase.Store_Table_Reservation.exception.customException.*;
 import com.zerobase.Store_Table_Reservation.member.entity.Member;
 import com.zerobase.Store_Table_Reservation.member.repository.MemberRepository;
 import com.zerobase.Store_Table_Reservation.reservation.dto.response.ReservationSuccessResponse;
+import com.zerobase.Store_Table_Reservation.reservation.dto.response.ReservationVisitedResponse;
 import com.zerobase.Store_Table_Reservation.reservation.entity.Reservation;
 import com.zerobase.Store_Table_Reservation.reservation.repository.ReservationRepository;
 import com.zerobase.Store_Table_Reservation.store.dto.request.*;
@@ -172,24 +173,48 @@ public class StoreService {
     /**
      * 예약확인하는 메서드. 유효성검사 진행
      */
-    public void arrivalConfirmation(ArrivalConfirmationDto dto) {
+    public ReservationVisitedResponse arrivalConfirmation(ArrivalConfirmationDto dto) {
         // 가게 PK 값과 유저의 ID 로 예약내역 불러오기
-        // 예약 내역이 존재하지 않는다면 예외 발생
-        Reservation reservation = reservationRepository.findByStoreCodeAndMemberId(dto.getStoreCode(), dto.getMemberId())
-                .orElseThrow(() -> new ReservationNotFoundException("예약내역이 존재하지 않습니다."));
+        List<Reservation> reservation = reservationRepository.findByStoreCodeAndMemberId(dto.getStoreCode(), dto.getMemberId(),dto.getReservationDate());
+        // 예약을 확정지을 변수 선언
+        Reservation nowReservation = new Reservation();
 
-        // 고객의 도착시간이 예약시간보다 10분 전이어야한다.
-        if (reservation.getReservationTime().isAfter(dto.getArrivalTime().plusMinutes(10))) {
-            System.out.println("reservation = " + reservation.getReservationTime());
-            System.out.println("dto.getArrivalTime().plusMinutes(10) = " + dto.getArrivalTime().plusMinutes(10));
+        // 예약 리스트가 사이즈가 0이면 예외 발생
+        if (reservation.size() == 0) {
+            throw new ReservationNotFoundException("예약 내역이 존재하지 않습니다.");
+        }
 
-            // 체크필요
-            throw new ReservationTimeInvalidException("예약시간이 만료되었습니다.");
+        // 리스트를 순회하며 업데이트할 boolean 변수
+        boolean reservationTimeInvalidException = true;
+        // 고객 10분전 도착
+        for (Reservation r : reservation) {
+            // Entity의 예약 시간과 고객의 도착시간 비교.
+            if (r.getReservationTime().getHour() - 1 == dto.getArrivalTime().getHour()
+                    && dto.getArrivalTime().getMinute() + 10 <= 60) {
+                // 변수 초기화
+                nowReservation = r;
+                // boolean 변수 설정
+                reservationTimeInvalidException = false;
+                break;
+            }
+        }
+
+        // 방문 처리 가능한 예약이 없을때 예외 발생
+        if (reservationTimeInvalidException) {
+            throw new ReservationTimeInvalidException("유효한 예약이 없습니다.");
         }
 
         // 방문처리 해주고 다시 DB에 저장
-        reservation.setVisited(true);
-        reservationRepository.save(reservation);
+        nowReservation.setVisited(true);
+        reservationRepository.save(nowReservation);
+
+        // DTO 로 response
+        return ReservationVisitedResponse.builder()
+                .storeName(nowReservation.getStore().getName())
+                .memberId(nowReservation.getMember().getMemberId())
+                .reservationDate(nowReservation.getReservationDate())
+                .reservationTime(nowReservation.getReservationTime())
+                .build();
     }
 
     /**

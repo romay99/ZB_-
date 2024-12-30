@@ -42,6 +42,7 @@ public class SecurityConfig {
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin((form) -> form.disable());
 
+        // 인증 작업 하지 않을 경로 설정
         http
                 .authorizeHttpRequests((request) ->
                         request.requestMatchers("/member/login", "/member/signup",

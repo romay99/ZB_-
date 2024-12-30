@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
@@ -17,7 +16,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("SELECT r FROM Reservation r WHERE r.store.code = :code AND r.reservationDate = :date")
     List<Reservation> findAllReservationByStoreAndToday(@Param("code") Long storeCode, @Param("date") LocalDate date);
 
-    // 가게 PK 로 가게를 찾고, 유저의 ID 값으로 예약 내역을 불러오는 메서드
-    @Query("SELECT r FROM Reservation r WHERE r.store.code = :code AND r.member.memberId = :memberId")
-    Optional<Reservation> findByStoreCodeAndMemberId(@Param("code") Long storeCode, @Param("memberId") String memberId);
+    // 가게 PK, 예약날짜로 가게를 찾고, 유저의 ID 값으로 예약 내역을 불러오는 메서드
+    @Query("SELECT r FROM Reservation r WHERE r.store.code = :code AND r.member.memberId = :memberId AND r.reservationDate = :date")
+    List<Reservation> findByStoreCodeAndMemberId(@Param("code") Long storeCode, @Param("memberId") String memberId,@Param("date") LocalDate date);
 }

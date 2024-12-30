@@ -3,6 +3,7 @@ package com.zerobase.Store_Table_Reservation.store.dto.request;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Getter
@@ -12,4 +13,6 @@ public class ArrivalConfirmationDto {
     private String memberId;
     private String memberTel;
     private LocalTime arrivalTime;
+    private LocalDate reservationDate;
+
 }
