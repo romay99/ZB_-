@@ -10,6 +10,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/store")
 @RequiredArgsConstructor
@@ -56,13 +58,17 @@ public class StoreController {
      * 가게의 상세정보를 조회하는 메서드
      */
     @GetMapping("/detail")
-    public ResponseEntity<StoreDetailDto> getStoreDetail(@RequestBody StoreDetailReqeustDto dto) {
+    public ResponseEntity<StoreDetailDto> getStoreDetail(@RequestBody StoreDetailRequestDto dto) {
         StoreDetailDto storeDetail = storeService.getStoreDetail(dto);
         return ResponseEntity.ok().body(storeDetail);
     }
 
-    public ResponseEntity<String> getStoreList() {
-        storeService.getStoreList();
-        return ResponseEntity.ok().body("구현중");
+    /**
+     * 모든 가게 정보 불러오기
+     */
+    @GetMapping("/list")
+    public ResponseEntity<List<StoreDetailDto>> getStoreList(@RequestBody StoreDetailRequestDto dto) {
+        List<StoreDetailDto> storeList = storeService.getStoreList(dto);
+        return ResponseEntity.ok().body(storeList);
     }
 }

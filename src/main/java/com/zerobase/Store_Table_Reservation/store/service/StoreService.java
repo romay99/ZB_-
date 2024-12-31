@@ -11,6 +11,8 @@ import com.zerobase.Store_Table_Reservation.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class StoreService {
@@ -99,7 +101,7 @@ public class StoreService {
     /**
      * 가게 상세정보 조회하는 메서드
      */
-    public StoreDetailDto getStoreDetail(StoreDetailReqeustDto dto) {
+    public StoreDetailDto getStoreDetail(StoreDetailRequestDto dto) {
         // 가게 정보가 존재하지 않으면 예외 발생
         Store store = storeRepository.findById(dto.getStoreCode()).orElseThrow(
                 () -> new StoreNotFoundException("존재하지 않는 가게 정보입니다."));
@@ -121,9 +123,24 @@ public class StoreService {
     }
 
     /**
-     * 가게 정보들 받아오는 메서드
+     * 가게 정보들 받아오는 메서드 (이름순 정렬)
      */
-    public void getStoreList() {
+    public List<StoreDetailDto> getStoreList(StoreDetailRequestDto dto) {
+        // DB 에서 가게정보를 오름차순으로 받아온다.
+        List<Store> storeList = storeRepository.findAllOrderByStoreName();
+
+        List<StoreDetailDto> responseDtoList = storeList.stream().map(
+                (data) -> StoreDetailDto.builder()
+                        .storeName(data.getName())
+                        .storeCode(data.getCode())
+                        .storeDescription(data.getDescription())
+                        .storeRating(data.getRating())
+                        // 거리정보를 getDistanceFromUser() 함수를 통해 초기화 해준다.
+                        .storeDistance(getDistanceFromUser(dto.getLatitude(), data.getLatitude(), dto.getLongitude(), data.getLongitude()))
+                        .build()
+        ).toList();
+
+        return responseDtoList;
 
     }
 }
