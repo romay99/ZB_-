@@ -90,5 +90,23 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * 예약한 유저와 리뷰를 쓰려는 유저가 같지 않을때 예외처리
+     */
+    @ExceptionHandler(ReservationMemberNotMatchException.class)
+    public ResponseEntity<ErrorResponse> handleReservationMemberNotMatchException(ReservationMemberNotMatchException e) {
+        ErrorResponse response = new ErrorResponse(e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * 유저가 방문하지 않은 (노쇼) 예약건에 리뷰를 작성하려할때 예외처리
+     */
+    @ExceptionHandler(ReservationNoShowException.class)
+    public ResponseEntity<ErrorResponse> handleReservationNoShowException(ReservationNoShowException e) {
+        ErrorResponse response = new ErrorResponse(e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
 
 }
