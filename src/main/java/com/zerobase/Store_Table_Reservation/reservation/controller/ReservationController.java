@@ -45,14 +45,11 @@ public class ReservationController {
     }
 
     /**
-     * 당일 예약목록 확인하는 메서드. 사장님만 이용가능
+     * 가게의 특정 날짜 예약 목록 조회하는 메서드
      */
-    @GetMapping("/today")
-    @PreAuthorize("hasRole('ROLE_PARTNER')") // 파트너 유저만 이 메서드를 이용가능하다.
+    @GetMapping("/list")
     public ResponseEntity<List<ReservationDetailResponse>> getTodayReservation(@RequestBody TodayReservationListRequest dto) {
-        // SecurityContextHolder 에서 인증된 사용자의 ID 를 가져온다.
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        List<ReservationDetailResponse> todayReservation = reservationService.getTodayReservation(dto,username);
+        List<ReservationDetailResponse> todayReservation = reservationService.getTodayReservation(dto);
         return ResponseEntity.ok().body(todayReservation);
     }
 }

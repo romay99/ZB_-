@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -80,7 +79,7 @@ public class ReservationService {
         Reservation nowReservation = new Reservation();
 
         // 예약 리스트가 사이즈가 0이면 예외 발생
-        if (reservation.size() == 0) {
+        if (reservation.isEmpty()) {
             throw new ReservationNotFoundException("예약 내역이 존재하지 않습니다.");
         }
 
@@ -120,17 +119,12 @@ public class ReservationService {
     /**
      * 전달받은 날짜에 해당하는 예약 목록 보여주는 메서드
      */
-    public List<ReservationDetailResponse> getTodayReservation(TodayReservationListRequest dto,String memberId) {
+    public List<ReservationDetailResponse> getTodayReservation(TodayReservationListRequest dto) {
         // storeRepository 에서 가게정보를 찾아온다.
         // 존재하지 않는다면 예외 발생
         Store store = storeRepository.findById(dto.getStoreCode()).orElseThrow(
                 () -> new StoreNotFoundException("가게정보가 존재하지 않습니다.")
         );
-
-        // 전달받은 JWT 의 아이디와 가게 사장님의 아이디가 다르면 예외발생
-        if (!store.getMember().getMemberId().equals(memberId)) {
-            throw new StoreMemberNotMatchException("본인 가게의 예약정보만 확인 가능합니다.");
-        }
 
         // 해당 가게의 당일 예약목록
         List<Reservation> todayReservationList = reservationRepository.findAllReservationByStoreAndToday(dto.getStoreCode(), dto.getDate());

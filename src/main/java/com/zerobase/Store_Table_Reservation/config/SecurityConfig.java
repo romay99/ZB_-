@@ -45,8 +45,10 @@ public class SecurityConfig {
         // 인증 작업 하지 않을 경로 설정
         http
                 .authorizeHttpRequests((request) ->
-                        request.requestMatchers("/member/login", "/member/signup",
-                                        "/store/detail","/reservation/visit","/store/list").permitAll()
+                        request.requestMatchers(
+                                "/member/login", "/member/signup",
+                                "/store/detail","/reservation/visit","/store/list",
+                                "reservation/list").permitAll()
                                 .anyRequest().authenticated());
 
         // JWT 필터 추가
