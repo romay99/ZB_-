@@ -42,6 +42,7 @@ public class ReviewService {
                 .content(dto.getContent())
                 .rating(dto.getRating())
                 .reservation(reservation)
+                .memberId(reservation.getMember().getMemberId())
                 .build());
 
         // DTO 로 변환후 반환

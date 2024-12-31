@@ -2,15 +2,13 @@ package com.zerobase.Store_Table_Reservation.review.controller;
 
 import com.zerobase.Store_Table_Reservation.review.dto.request.ReviewPostDto;
 import com.zerobase.Store_Table_Reservation.review.dto.response.ReviewDetailResponse;
+import com.zerobase.Store_Table_Reservation.review.repository.ReviewRepository;
 import com.zerobase.Store_Table_Reservation.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,4 +25,5 @@ public class ReviewController {
         ReviewDetailResponse response = reviewService.writeReview(dto, username);
         return ResponseEntity.ok(response);
     }
+
 }

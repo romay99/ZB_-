@@ -21,4 +21,7 @@ public class Review {
 
     @OneToOne
     private Reservation reservation;
+
+    // 작성자의 ID
+    private String memberId;
 }
