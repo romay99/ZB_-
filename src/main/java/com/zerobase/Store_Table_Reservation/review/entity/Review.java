@@ -24,4 +24,7 @@ public class Review {
 
     // 작성자의 ID
     private String memberId;
+
+    // 리뷰 내용 수정 여부
+    private boolean modified;
 }

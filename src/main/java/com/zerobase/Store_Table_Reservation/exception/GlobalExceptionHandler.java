@@ -108,5 +108,30 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * 리뷰 수정,삭제 시에 리뷰내용이 존재하지 않을때 예외처리
+     */
+    @ExceptionHandler(ReviewNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleReviewNotFoundException(ReviewNotFoundException e) {
+        ErrorResponse response = new ErrorResponse(e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 
+    /**
+     * 리뷰 작성자와 수정하는 유저가 다를시 예외처리
+     */
+    @ExceptionHandler(ReviewMemberNotMatchException.class)
+    public ResponseEntity<ErrorResponse> handleReviewMemberNotMatchException(ReviewMemberNotMatchException e) {
+        ErrorResponse response = new ErrorResponse(e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * 해당 가게의 점장, 리뷰작성자 외 사람이 리뷰를 삭제하려할때 예외처리
+     */
+    @ExceptionHandler(ReviewDeleteRejectedException.class)
+    public ResponseEntity<ErrorResponse> handleReviewDeleteRejectedException(ReviewDeleteRejectedException e) {
+        ErrorResponse response = new ErrorResponse(e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 }

@@ -1,10 +1,9 @@
 package com.zerobase.Store_Table_Reservation.review.service;
 
-import com.zerobase.Store_Table_Reservation.exception.customException.ReservationMemberNotMatchException;
-import com.zerobase.Store_Table_Reservation.exception.customException.ReservationNoShowException;
-import com.zerobase.Store_Table_Reservation.exception.customException.ReservationNotFoundException;
+import com.zerobase.Store_Table_Reservation.exception.customException.*;
 import com.zerobase.Store_Table_Reservation.reservation.entity.Reservation;
 import com.zerobase.Store_Table_Reservation.reservation.repository.ReservationRepository;
+import com.zerobase.Store_Table_Reservation.review.dto.request.ReviewModifyDto;
 import com.zerobase.Store_Table_Reservation.review.dto.request.ReviewPostDto;
 import com.zerobase.Store_Table_Reservation.review.dto.response.ReviewDetailResponse;
 import com.zerobase.Store_Table_Reservation.review.entity.Review;
@@ -43,6 +42,7 @@ public class ReviewService {
                 .rating(dto.getRating())
                 .reservation(reservation)
                 .memberId(reservation.getMember().getMemberId())
+                .modified(false)
                 .build());
 
         // DTO 로 변환후 반환
@@ -51,5 +51,51 @@ public class ReviewService {
                 .content(review.getContent())
                 .rating(review.getRating())
                 .build();
+    }
+
+    /**
+     * 리뷰 수정하는 메서드.
+     */
+    public ReviewDetailResponse modifyReview(ReviewModifyDto dto, String username) {
+        // 리뷰 내용이 존재하지 않는다면 예외처리
+        Review review = reviewRepository.findById(dto.getReviewCode()).orElseThrow(
+                ()-> new ReviewNotFoundException("리뷰 내용이 존재하지 않습니다.")
+        );
+
+        // 본인의 리뷰가 아닐시 예외 처리
+        if (!review.getMemberId().equals(username)) {
+            throw new ReviewMemberNotMatchException("본인의 리뷰만 수정,삭제 가능합니다.");
+        }
+
+        // 리뷰 수정 내용 적용
+        review.setRating(dto.getRating());
+        review.setContent(dto.getContent());
+        review.setModified(true);
+        reviewRepository.save(review);
+
+        // DTO 로 변환후 반환
+        return ReviewDetailResponse.builder()
+                .reviewCode(review.getReviewCode())
+                .content(review.getContent())
+                .rating(review.getRating())
+                .build();
+
+    }
+
+    /**
+     * 리뷰 삭제하는 메서드
+     */
+    public void deleteReview(Long reviewCode, String username) {
+        // 리뷰 내용이 존재하지 않는다면 예외처리
+        Review review = reviewRepository.findById(reviewCode).orElseThrow(
+                ()-> new ReviewNotFoundException("리뷰 내용이 존재하지 않습니다.")
+        );
+
+        // 리뷰의 작성자가 아니거나, 해당 가게의 점장이 아니라면 예외 처리
+        if (!review.getMemberId().equals(username) &&
+                !review.getReservation().getStore().getMember().getMemberId().equals(username)) {
+            throw new ReviewDeleteRejectedException("삭제 권한이 없습니다.");
+        }
+        reviewRepository.delete(review);
     }
 }
