@@ -66,9 +66,18 @@ public class StoreController {
     /**
      * 모든 가게 정보 불러오기
      */
-    @GetMapping("/list")
+    @GetMapping("/list-all")
     public ResponseEntity<List<StoreDetailDto>> getStoreList(@RequestBody StoreDetailRequestDto dto) {
         List<StoreDetailDto> storeList = storeService.getStoreList(dto);
+        return ResponseEntity.ok().body(storeList);
+    }
+
+    /**
+     * 가게 정보 불러오기 (별점 순)
+     */
+    @GetMapping("/list-rating")
+    public ResponseEntity<List<StoreDetailDto>> getStoreListByRating(@RequestBody StoreDetailRequestDto dto) {
+        List<StoreDetailDto> storeList = storeService.getStoreListByRating(dto);
         return ResponseEntity.ok().body(storeList);
     }
 }

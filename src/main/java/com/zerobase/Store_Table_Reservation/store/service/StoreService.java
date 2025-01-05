@@ -10,6 +10,7 @@ import com.zerobase.Store_Table_Reservation.store.entity.Store;
 import com.zerobase.Store_Table_Reservation.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -141,6 +142,25 @@ public class StoreService {
         ).toList();
 
         return responseDtoList;
+    }
 
+    /**
+     * 가게 정보 받아오는 메서드 (별점 순 정렬)
+     */
+    public List<StoreDetailDto> getStoreListByRating(StoreDetailRequestDto dto) {
+        List<Store> storeList = storeRepository.findAllByRating();
+
+        List<StoreDetailDto> responseDtoList = storeList.stream().map(
+                (data) -> StoreDetailDto.builder()
+                        .storeName(data.getName())
+                        .storeCode(data.getCode())
+                        .storeDescription(data.getDescription())
+                        .storeRating(data.getRating())
+                        // 거리정보를 getDistanceFromUser() 함수를 통해 초기화 해준다.
+                        .storeDistance(getDistanceFromUser(dto.getLatitude(), data.getLatitude(), dto.getLongitude(), data.getLongitude()))
+                        .build()
+        ).toList();
+
+        return responseDtoList;
     }
 }
