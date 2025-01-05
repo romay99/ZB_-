@@ -3,6 +3,7 @@ package com.zerobase.Store_Table_Reservation.reservation.service;
 import com.zerobase.Store_Table_Reservation.exception.customException.*;
 import com.zerobase.Store_Table_Reservation.member.entity.Member;
 import com.zerobase.Store_Table_Reservation.member.repository.MemberRepository;
+import com.zerobase.Store_Table_Reservation.reservation.dto.request.ReservationValidDto;
 import com.zerobase.Store_Table_Reservation.reservation.dto.request.TodayReservationListRequest;
 import com.zerobase.Store_Table_Reservation.reservation.dto.response.ReservationDetailResponse;
 import com.zerobase.Store_Table_Reservation.reservation.dto.response.ReservationSuccessResponse;
@@ -58,6 +59,7 @@ public class ReservationService {
                         .visited(false)
                         .store(store)
                         .member(member)
+                        .valid(false)
                         .build()
         );
 
@@ -131,5 +133,30 @@ public class ReservationService {
         // DTO 로 변환한 List 를 반호나
         return todayReservationList.stream().map(
                 (data) -> ReservationDetailResponse.toDto(data)).collect(Collectors.toList());
+    }
+
+    /**
+     * 예약 수락 / 거절하는 메서드
+     */
+    public boolean makeValidReservation(ReservationValidDto dto, String memberId) {
+        // 예약내용이 존재하는지 유효성 검사
+        Reservation reservation = reservationRepository.findById(dto.getReservationCode()).orElseThrow(
+                () -> new ReservationNotFoundException("예약정보가 존재하지않습니다.")
+        );
+
+        // 예약한 가게의 사장님과 메서드를 호출한 사람이 다를때 예외처리
+        if (!reservation.getStore().getMember().getMemberId().equals(memberId)) {
+            throw new ReservationMemberNotMatchException("본인의 가게의 예약만 수락/거절 할 수 있습니다.");
+        }
+
+        // 예약 수락일 경우, valid 변수를 true 로 바꾸고 true 리턴
+        if (dto.isMakeValid()) {
+            reservation.setValid(true);
+            reservationRepository.save(reservation);
+            return true;
+        } else { // 거절 일 경우 예약 내역 삭제 후 false 리턴
+            reservationRepository.delete(reservation);
+            return false;
+        }
     }
 }

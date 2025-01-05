@@ -1,5 +1,6 @@
 package com.zerobase.Store_Table_Reservation.reservation.controller;
 
+import com.zerobase.Store_Table_Reservation.reservation.dto.request.ReservationValidDto;
 import com.zerobase.Store_Table_Reservation.reservation.dto.request.TodayReservationListRequest;
 import com.zerobase.Store_Table_Reservation.reservation.dto.response.ReservationDetailResponse;
 import com.zerobase.Store_Table_Reservation.reservation.dto.response.ReservationSuccessResponse;
@@ -51,5 +52,21 @@ public class ReservationController {
     public ResponseEntity<List<ReservationDetailResponse>> getTodayReservation(@RequestBody TodayReservationListRequest dto) {
         List<ReservationDetailResponse> todayReservation = reservationService.getTodayReservation(dto);
         return ResponseEntity.ok().body(todayReservation);
+    }
+
+    /**
+     * 예약에 대한 수락 / 거절 메서드. (사장님 전용 메서드)
+     */
+    @PostMapping("/valid")
+    @PreAuthorize("hasRole('ROLE_PARTNER')")
+    public ResponseEntity<String> makeValidReservation(@RequestBody ReservationValidDto dto) {
+        // SecurityContextHolder 에서 인증된 사용자의 ID 를 가져온다.
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        boolean result = reservationService.makeValidReservation(dto, username);
+
+        if (result) {
+            return ResponseEntity.ok().body("예약이 확정되었습니다.");
+        }
+        return ResponseEntity.ok().body("예약이 거절되었습니다.");
     }
 }

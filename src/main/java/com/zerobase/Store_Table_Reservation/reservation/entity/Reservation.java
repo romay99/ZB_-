@@ -30,4 +30,6 @@ public class Reservation {
 
     @ManyToOne
     private Member member;
+
+    private boolean valid;
 }

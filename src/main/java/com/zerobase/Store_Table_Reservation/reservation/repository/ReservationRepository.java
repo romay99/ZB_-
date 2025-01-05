@@ -20,7 +20,4 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("SELECT r FROM Reservation r WHERE r.store.code = :code AND r.member.memberId = :memberId AND r.reservationDate = :date")
     List<Reservation> findByStoreCodeAndMemberId(@Param("code") Long storeCode, @Param("memberId") String memberId,@Param("date") LocalDate date);
 
-    // 가게별 가게를 방문한 예약 내역들만 불러온다.
-    @Query("SELECT r FROM Reservation r WHERE r.store.code = :code AND r.visited = TRUE")
-    List<Reservation> findAllByStoreCode(@Param("code") Long code);
 }
