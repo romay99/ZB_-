@@ -43,6 +43,7 @@ public class ReviewService {
                 .reservation(reservation)
                 .memberId(reservation.getMember().getMemberId())
                 .modified(false)
+                .storeCode(reservation.getStore().getCode())
                 .build());
 
         // DTO 로 변환후 반환

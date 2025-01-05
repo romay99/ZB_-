@@ -27,4 +27,7 @@ public class Review {
 
     // 리뷰 내용 수정 여부
     private boolean modified;
+
+    private Long storeCode;
+
 }

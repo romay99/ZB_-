@@ -3,12 +3,16 @@ package com.zerobase.Store_Table_Reservation.store.service;
 import com.zerobase.Store_Table_Reservation.exception.customException.*;
 import com.zerobase.Store_Table_Reservation.member.entity.Member;
 import com.zerobase.Store_Table_Reservation.member.repository.MemberRepository;
+import com.zerobase.Store_Table_Reservation.reservation.entity.Reservation;
 import com.zerobase.Store_Table_Reservation.reservation.repository.ReservationRepository;
+import com.zerobase.Store_Table_Reservation.review.entity.Review;
+import com.zerobase.Store_Table_Reservation.review.repository.ReviewRepository;
 import com.zerobase.Store_Table_Reservation.store.dto.request.*;
 import com.zerobase.Store_Table_Reservation.store.dto.response.StoreDetailDto;
 import com.zerobase.Store_Table_Reservation.store.entity.Store;
 import com.zerobase.Store_Table_Reservation.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -19,6 +23,7 @@ import java.util.List;
 public class StoreService {
     private final StoreRepository storeRepository;
     private final MemberRepository memberRepository;
+    private final ReviewRepository reviewRepository;
 
     /**
      * 두 지점의 거리를 구하는 Haversine 공식
@@ -162,5 +167,28 @@ public class StoreService {
         ).toList();
 
         return responseDtoList;
+    }
+
+    /**
+     * 매일 새벽 1시에 각 가게의 평점을 업데이트한다.
+     */
+    @Scheduled(cron = "0 0 1 * * *")
+    private void allStoreUpdateRating() {
+        List<Store> allStore = storeRepository.findAll();
+
+        for (Store store : allStore) {
+            List<Review> allReview = reviewRepository.findAllByStoreCode(store.getCode());
+            double avg = 0.0;
+
+            // 해당 가게의 모든 리뷰의 별점을 평균계산 하기
+            for (Review review : allReview) {
+                avg += review.getRating();
+            }
+            avg /= allReview.size();
+
+            // 별점 업데이트 후 저장
+            store.setRating(avg);
+            storeRepository.save(store);
+        }
     }
 }
